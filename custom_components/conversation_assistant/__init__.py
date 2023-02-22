@@ -13,10 +13,18 @@ _LOGGER = logging.getLogger(__name__)
 CONFIG_SCHEMA = cv.deprecated(manifest.domain)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hass.data.setdefault('conversation_assistant', ConversationAssistant(hass, entry.options))
+    ''' 安装集成 '''
+    await update_listener(hass, entry)
+
+    entry.async_on_unload(entry.add_update_listener(update_listener))
     return True
 
+async def update_listener(hass, entry):
+    ''' 更新配置 '''
+    hass.data.setdefault('conversation_assistant', ConversationAssistant(hass, entry.options))
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    ''' 删除集成 '''
     del hass.data['conversation_assistant']
     return True
 
@@ -34,8 +42,31 @@ class ConversationAssistant:
         if result is not None:
             return result
 
+    async def async_music(self, text):
+        if self.music_id is not None:
+            service_name = None
+            service_data = {
+                'entity_id': self.music_id
+            }
+            if text == '播放':
+                service_name= 'media_play'
+            elif text == '暂停':
+                service_name= 'media_pause'
+            elif text == '上一曲':
+                service_name= 'media_previous_track'
+            elif text == '下一曲':
+                service_name= 'media_next_track'
+            elif ['声音小点', '小点声音', '小一点声音', '声音小一点'].count(text) == 1:
+                service_name= 'volume_down'
+            elif ['声音大点', '大点声音', '大一点声音', '声音大一点'].count(text) == 1:
+                service_name= 'volume_up'
+
+            if service_name is not None:
+                await self.hass.services.async_call('media_player', service_name, service_data)
+                return f'音乐{text}'
+
     async def async_calendar(self, text):
-        if '提醒我' in text:
+        if self.calendar_id is not None and '提醒我' in text:
             arr = text.split('提醒我')
             time_text = arr[0]
             # 判断是否输入时间
