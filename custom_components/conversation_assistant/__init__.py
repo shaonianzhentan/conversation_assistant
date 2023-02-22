@@ -42,6 +42,10 @@ class ConversationAssistant:
         if result is not None:
             return result
 
+        result = await self.async_music(text)
+        if result is not None:
+            return result
+
     async def async_music(self, text):
         if self.music_id is not None:
             service_name = None
@@ -78,20 +82,29 @@ class ConversationAssistant:
             if length > 0:
                 result = results[length - 1]
                 values = list(result.resolution.values())[0]
-                value = values[len(values) - 1]
-
+                print(values)
+                value = values[0]
                 t = value['type']
                 v = value['value']
 
-                start_date_time = None
                 now = datetime.datetime.now()
+                start_date_time = None
+
+                # 早晚
+                if len(values) == 2:
+                    # 和当前时间比较
+                    if t == 'time':
+                        if now.strftime('%H:%M:%S') > v:
+                            value = values[1]
+                            t = value['type']
+                            v = value['value']
 
                 if t == 'datetime':
                     start_date_time = v
                 elif t == 'time':
                     localtime = now.strftime('%Y-%m-%d %H:%M:%S')
                     if v < localtime[11:]:
-                        return '时间已经过去了'
+                        return '时间已经过去了，没有提醒的必要啦'
                     start_date_time = localtime[:11] + v
                 elif t == 'duration':
                     now = now + datetime.timedelta(seconds=+int(v))
