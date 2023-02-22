@@ -1,0 +1,33 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "语音助手",
+                "description": "语音助手扩展插件",
+                "data": {}
+            }
+        },
+        "error": {
+            "conversation": "请先安装配置语音小助手  https://github.com/shaonianzhentan/conversation"
+        },
+        "abort": {
+            "single_instance_allowed": "仅允许单个配置."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "语音助手",
+                "description": "指定默认控制的实体",
+                "data": {
+                    "calendar_id": "日历",
+                    "music_id": "音乐",
+                    "weather_id": "天气"
+                }
+            }
+        },
+        "error": {
+            "login_failed": "登录失败"
+        }
+    }
+}
