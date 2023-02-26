@@ -12,6 +12,8 @@ from .manifest import manifest
 _LOGGER = logging.getLogger(__name__)
 CONFIG_SCHEMA = cv.deprecated(manifest.domain)
 
+DOMAIN = manifest.domain
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ''' 安装集成 '''
     await update_listener(hass, entry)
@@ -21,11 +23,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def update_listener(hass, entry):
     ''' 更新配置 '''
-    hass.data.setdefault('conversation_assistant', ConversationAssistant(hass, entry.options))
+    if hass.data.get(DOMAIN) is not None:
+        del hass.data[DOMAIN]
+    hass.data.setdefault(DOMAIN, ConversationAssistant(hass, entry.options))
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ''' 删除集成 '''
-    del hass.data['conversation_assistant']
+    del hass.data[DOMAIN]
     return True
 
 class ConversationAssistant:
