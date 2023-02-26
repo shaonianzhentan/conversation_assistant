@@ -64,6 +64,16 @@ class ConversationAssistant:
                 service_name= 'volume_down'
             elif ['声音大点', '大点声音', '大一点声音', '声音大一点'].count(text) == 1:
                 service_name= 'volume_up'
+            elif text.startswith('我想听'):
+                arr = text.split('我想听')
+                if len(arr) == 2 and arr[1] != '':
+                    kv = arr[1]
+                    service_name = 'play_media'
+                    service_data.update({
+                        'media_content_type': 'music',
+                        'media_content_id': f'cloudmusic://search/play?kv={kv}'
+                    })
+                    text = '正在搜索匹配中'
 
             if service_name is not None:
                 await self.hass.services.async_call('media_player', service_name, service_data)
