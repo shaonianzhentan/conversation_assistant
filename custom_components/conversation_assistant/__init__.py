@@ -72,12 +72,25 @@ class ConversationAssistant:
                 arr = text.split('我想听')
                 if len(arr) == 2 and arr[1] != '':
                     kv = arr[1]
+                    media_id = f'cloudmusic://search/play?kv={kv}'
+
+                    if ['每日推荐', '每日推荐音乐', '每日推荐歌曲', '每日推荐歌单'].count(kv) == 1:
+                        media_id = 'cloudmusic://163/my/daily'
+                    elif kv.endswith('歌单'):
+                        media_id = f'cloudmusic://play/list?kv={kv}'
+
                     service_name = 'play_media'
                     service_data.update({
                         'media_content_type': 'music',
-                        'media_content_id': f'cloudmusic://search/play?kv={kv}'
+                        'media_content_id': media_id
                     })
                     text = '正在搜索匹配中'
+            elif text.startswith('播放电台'):
+                pass
+            elif text.startswith('播放歌单'):
+                pass
+            elif text.startswith('播放专辑'):
+                pass
 
             if service_name is not None:
                 await self.hass.services.async_call('media_player', service_name, service_data)
