@@ -68,27 +68,64 @@ class ConversationAssistant:
                 service_name= 'volume_down'
             elif ['声音大点', '大点声音', '大一点声音', '声音大一点'].count(text) == 1:
                 service_name= 'volume_up'
+            elif text.startswith('播放每日推荐'):
+                service_name = 'play_media'
+                service_data.update({
+                    'media_content_type': 'music',
+                    'media_content_id': 'cloudmusic://163/my/daily'
+                })
+                text = f'正在播放每日推荐音乐'
+
+            elif text.startswith('我想听') and text.endswith('的歌'):
+                matchObj = re.match(r'我想听(.+)的歌', text)
+                if matchObj is not None:
+                    singer = matchObj.group(1)
+                    service_name = 'play_media'
+                    service_data.update({
+                        'media_content_type': 'music',
+                        'media_content_id': 'cloudmusic://play/singer?kv=' + singer
+                    })
+                    text = f'正在播放{singer}的歌'
+
             elif text.startswith('我想听'):
                 arr = text.split('我想听')
                 if len(arr) == 2 and arr[1] != '':
                     kv = arr[1]
-                    media_id = f'cloudmusic://search/play?kv={kv}'
+                    media_id = f'cloudmusic://play/song?kv={kv}'
 
-                    if ['每日推荐', '每日推荐音乐', '每日推荐歌曲', '每日推荐歌单'].count(kv) == 1:
-                        media_id = 'cloudmusic://163/my/daily'
-                    elif kv.endswith('歌单'):
+                    if kv.endswith('歌单'):
                         media_id = f'cloudmusic://play/list?kv={kv}'
+
+                    text = f'正在搜索播放{kv}'
 
                     service_name = 'play_media'
                     service_data.update({
                         'media_content_type': 'music',
                         'media_content_id': media_id
                     })
-                    text = '正在搜索匹配中'
+
             elif text.startswith('播放电台'):
-                pass
+                arr = text.split('播放电台')
+                if len(arr) == 2 and arr[1] != '':
+                    kv = arr[1]
+                    service_name = 'play_media'
+                    service_data.update({
+                        'media_content_type': 'music',
+                        'media_content_id': f'cloudmusic://play/radio?kv={kv}'
+                    })
+                    text = f'正在播放电台{kv}'
+
             elif text.startswith('播放歌单'):
-                pass
+                arr = text.split('播放歌单')
+                if len(arr) == 2 and arr[1] != '':
+                    kv = arr[1]
+                    service_name = 'play_media'
+                    service_data.update({
+                        'media_content_type': 'music',
+                        'media_content_id': f'cloudmusic://play/list?kv={kv}'
+                    })
+                    text = f'正在播放歌单{kv}'
+
             elif text.startswith('播放专辑'):
                 pass
 
