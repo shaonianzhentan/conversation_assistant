@@ -50,6 +50,14 @@ class ConversationAssistant:
         if result is not None:
             return result
 
+        result = await self.async_weather(text)
+        if result is not None:
+            return result
+
+    async def async_weather(self, text):
+        if self.weather_id is not None:
+            pass
+
     async def async_music(self, text):
         if self.music_id is not None:
             service_name = None
